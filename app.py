@@ -3,7 +3,7 @@ import json
 import os
 import mysql.connector
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+app = Flask(__name__)
 
 DB_HOST = os.environ.get("DB_HOST")
 DB_USER = os.environ.get("DB_USER")
@@ -161,6 +161,7 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
