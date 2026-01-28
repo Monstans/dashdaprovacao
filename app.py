@@ -5,10 +5,11 @@ import mysql.connector
 
 app = Flask(__name__)
 
-DB_HOST = os.environ.get("DB_HOST", "localhost")
-DB_USER = os.environ.get("DB_USER", "root")
-DB_PASS = os.environ.get("DB_PASS", "")
-DB_NAME = "sisu_db"
+DB_HOST = os.environ.get("DB_HOST")
+DB_USER = os.environ.get("DB_USER")
+DB_PASS = os.environ.get("DB_PASS")
+DB_NAME = os.environ.get("DB_NAME", "sisu_db")
+DB_PORT = int(os.environ.get("DB_PORT", 4000))
 
 ARQUIVO_NOMES = 'cursos.json'
 ARQUIVO_DADOS = 'banco_de_dados_completo.json'
@@ -22,18 +23,18 @@ def salvar_lead_mysql(nome, email, telefone):
             host=DB_HOST,
             user=DB_USER,
             password=DB_PASS,
-            database=DB_NAME
+            database=DB_NAME,
+            port=DB_PORT,
+            ssl_verify_identity=False,
+            ssl_ca=''
         )
         
         if conexao.is_connected():
             cursor = conexao.cursor()
-            
             sql = "INSERT INTO leads (nome, email, telefone) VALUES (%s, %s, %s)"
             valores = (nome, email, telefone)
-            
             cursor.execute(sql, valores)
             conexao.commit()
-            
             print(f"Lead salvo: {nome}")
 
     except mysql.connector.Error as erro:
@@ -160,4 +161,5 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
