@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard da Aprovação</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Simulador SISU</h1>
+
+        {% if erro %}
+            <div class="erro">{{ erro }}</div>
+        {% endif %}
+
+        <form id="formCalculo" method="POST" action="/">
+            
+            <div class="input-group">
+                <label for="curso_id">Selecione o Curso:</label>
+                <select name="curso_id" id="curso_id" required>
+                    <option value="" disabled selected>Escolha uma opção...</option>
+                    {% for id, nome in cursos.items() %}
+                        <option value="{{ id }}">{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="notas-grid">
+                <div class="input-group">
+                    <label>Linguagens</label>
+                    <input type="text" name="linguagens" placeholder="Ex: 650.5" required>
+                </div>
+                <div class="input-group">
+                    <label>Humanas</label>
+                    <input type="text" name="humanas" placeholder="Ex: 700" required>
+                </div>
+                <div class="input-group">
+                    <label>Natureza</label>
+                    <input type="text" name="natureza" placeholder="Ex: 750" required>
+                </div>
+                <div class="input-group">
+                    <label>Matemática</label>
+                    <input type="text" name="matematica" placeholder="Ex: 800" required>
+                </div>
+                <div class="input-group">
+                    <label>Redação</label>
+                    <input type="text" name="redacao" placeholder="Ex: 900" required>
+                </div>
+            </div>
+
+            <button type="button" onclick="abrirModal()">Calcular Minha Média</button>
+
+            <div id="modalLead" class="modal-overlay">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="fecharModal()">&times;</span>
+                    <h2>Quase lá!</h2>
+                    <p>Para ver seu resultado detalhado, preencha seus dados abaixo:</p>
+                    
+                    <div class="input-group">
+                        <label>Nome Completo</label>
+                        <input type="text" name="nome_lead" id="nome_lead">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>E-mail</label>
+                        <input type="email" name="email_lead" id="email_lead" placeholder="seu@email.com">
+                        <small id="erroEmail" class="msg-erro"></small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Celular (DDD + Número)</label>
+                        <input type="text" name="telefone_lead" id="telefone_lead" placeholder="Ex: 11999999999" maxlength="11">
+                        <small id="erroTel" class="msg-erro"></small>
+                    </div>
+
+                    <button type="button" onclick="validarEEnviar()">Ver Resultado</button>
+                </div>
+            </div>
+
+        </form>
+
+        {% if resultados %}
+            <h2>Resultados para: {{ curso_selecionado }}</h2>
+            <div class="resultados-lista">
+                {% for item in resultados %}
+                <div class="resultado-card">
+                    <div class="info-faculdade">
+                        <h3>{{ item.faculdade }}</h3>
+                        <p>{{ item.campus }}</p>
+                        <p>📍 {{ item.local }}</p>
+                    </div>
+                    <div class="nota-destaque">
+                        <span>Média Final</span>
+                        <div class="nota-valor">{{ item.media }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function abrirModal() {
+            const form = document.getElementById('formCalculo');
+            if (form.checkValidity()) {
+                document.getElementById('modalLead').style.display = 'flex';
+            } else {
+                form.reportValidity();
+            }
+        }
+
+        function fecharModal() {
+            document.getElementById('modalLead').style.display = 'none';
+        }
+
+        function validarEEnviar() {
+            const nome = document.getElementById('nome_lead').value;
+            const email = document.getElementById('email_lead').value;
+            const telefone = document.getElementById('telefone_lead').value;
+            
+            const erroEmail = document.getElementById('erroEmail');
+            const erroTel = document.getElementById('erroTel');
+            
+            erroEmail.innerText = "";
+            erroTel.innerText = "";
+            let valido = true;
+
+            // Validação Nome
+            if (nome.trim().length < 3) {
+                alert("Por favor, digite seu nome completo.");
+                valido = false;
+            }
+
+            // Validação Email (Regex: texto @ texto . 2+ letras)
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+            if (!regexEmail.test(email)) {
+                erroEmail.innerText = "Digite um e-mail válido";
+                valido = false;
+            }
+
+            const apenasNumeros = telefone.replace(/\D/g, ''); 
+            if (apenasNumeros.length !== 11) {
+                erroTel.innerText = "Digite um número de telefone válido";
+                valido = false;
+            }
+
+            if (valido) {
+                document.getElementById('formCalculo').submit();
+            }
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalLead');
+            if (event.target == modal) {
+                fecharModal();
+            }
+        }
+    </script>
+
+</body>
+</html>
