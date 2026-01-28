@@ -4,7 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard da Aprovação</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; font-size: 1.8rem; }
+        h2 { color: #34495e; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; margin-top: 40px; margin-bottom: 20px; }
+
+        form { display: flex; flex-direction: column; gap: 20px; }
+        label { font-weight: 600; margin-bottom: 5px; display: block; color: #555; }
+
+        select, input[type="text"], input[type="number"], input[type="email"] {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem;
+        }
+
+        .notas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        button {
+            background-color: #3498db; color: white; padding: 15px; border: none; border-radius: 8px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%;
+        }
+        button:hover { background-color: #2980b9; }
+
+        .erro { background-color: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+
+        /* Resultados */
+        .resultados-lista { display: flex; flex-direction: column; gap: 15px; }
+        .resultado-card {
+            background: #fff; border: 1px solid #e1e4e8; border-radius: 10px; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .nota-destaque { text-align: right; background-color: #f0f9ff; padding: 10px 15px; border-radius: 8px; border-left: 4px solid #3498db; }
+        .nota-valor { font-size: 1.5rem; font-weight: 800; color: #2c3e50; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center; align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%; max-width: 450px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            position: relative;
+            text-align: center;
+        }
+
+        .modal-content h2 { margin-top: 0; color: #2c3e50; border-bottom: none; }
+        .modal-content p { margin-bottom: 20px; color: #666; }
+
+        .close-btn {
+            position: absolute; top: 10px; right: 15px;
+            color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;
+        }
+        .close-btn:hover { color: #000; }
+
+        .msg-erro {
+            color: #e74c3c; font-size: 0.85rem; margin-top: 5px; display: block; text-align: left;
+        }
+
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .resultado-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .nota-destaque { width: 100%; text-align: center; border-left: none; border-top: 4px solid #3498db; }
+        }
+    </style>
 </head>
 <body>
 
@@ -59,18 +154,18 @@
                     <p>Para ver seu resultado detalhado, preencha seus dados abaixo:</p>
                     
                     <div class="input-group">
-                        <label>Nome Completo</label>
+                        <label style="text-align: left;">Nome Completo</label>
                         <input type="text" name="nome_lead" id="nome_lead">
                     </div>
                     
                     <div class="input-group">
-                        <label>E-mail</label>
+                        <label style="text-align: left;">E-mail</label>
                         <input type="email" name="email_lead" id="email_lead" placeholder="seu@email.com">
                         <small id="erroEmail" class="msg-erro"></small>
                     </div>
                     
                     <div class="input-group">
-                        <label>Celular (DDD + Número)</label>
+                        <label style="text-align: left;">Celular (DDD + Número)</label>
                         <input type="text" name="telefone_lead" id="telefone_lead" placeholder="Ex: 11999999999" maxlength="11">
                         <small id="erroTel" class="msg-erro"></small>
                     </div>
@@ -104,10 +199,19 @@
     <script>
         function abrirModal() {
             const form = document.getElementById('formCalculo');
-            if (form.checkValidity()) {
+            const camposNotas = form.querySelectorAll('select, input:not(#nome_lead):not(#email_lead):not(#telefone_lead)');
+            let formValido = true;
+            
+            camposNotas.forEach(campo => {
+                if (!campo.checkValidity()) {
+                    campo.reportValidity();
+                    formValido = false;
+                    return;
+                }
+            });
+
+            if (formValido) {
                 document.getElementById('modalLead').style.display = 'flex';
-            } else {
-                form.reportValidity();
             }
         }
 
@@ -133,16 +237,17 @@
                 valido = false;
             }
 
-            // Validação Email (Regex: texto @ texto . 2+ letras)
+            // Validação Email
             const regexEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
             if (!regexEmail.test(email)) {
                 erroEmail.innerText = "Digite um e-mail válido";
                 valido = false;
             }
 
+            // Validação Telefone
             const apenasNumeros = telefone.replace(/\D/g, ''); 
             if (apenasNumeros.length !== 11) {
-                erroTel.innerText = "Digite um número de telefone válido";
+                erroTel.innerText = "Digite um número de telefone válido (11 dígitos)";
                 valido = false;
             }
 
