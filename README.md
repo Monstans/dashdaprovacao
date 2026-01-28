@@ -1,42 +1,55 @@
 # Dashboard da Aprovação
 
-Esta aplicação é uma ferramenta estratégica desenvolvida para o mercado de educação. O sistema processa as notas do ENEM inseridas pelo usuário e aplica, em tempo real, os pesos específicos de cada universidade e curso cadastrados no banco de dados.
+> **Ferramenta estratégica para simulação de notas do SISU e captação de leads.**
+
+Esta aplicação é uma ferramenta desenvolvida para o mercado de educação. O sistema processa as notas do ENEM inseridas pelo usuário e aplica, em tempo real, os pesos específicos de cada universidade e curso cadastrados no banco de dados.
 
 O objetivo é resolver a complexidade do cálculo manual de médias ponderadas, permitindo que o estudante descubra instantaneamente em quais instituições sua nota possui maior valor competitivo.
 
+---
+
 ## O Problema
 
-No SISU (Sistema de Seleção Unificada), cada universidade tem autonomia para atribuir pesos diferentes às áreas do conhecimento (Redação, Matemática, etc.). Um aluno com nota alta em Matemática, por exemplo, terá uma média final muito superior em uma universidade que atribui peso 3 para essa matéria, em comparação a outra que atribui peso 1.
+No **SISU (Sistema de Seleção Unificada)**, cada universidade tem autonomia para atribuir pesos diferentes às áreas do conhecimento (Redação, Matemática, etc.).
 
-Calcular isso manualmente para centenas de opções é inviável. Esta ferramenta automatiza esse processo, servindo também como um ponto de captação de potenciais alunos (leads) para instituições de ensino ou cursos preparatórios.
+*Exemplo:* Um aluno com nota alta em Matemática terá uma média final muito superior em uma universidade que atribui **peso 3** para essa matéria, em comparação a outra que atribui **peso 1**.
+
+Calcular isso manualmente para centenas de opções é inviável. Esta ferramenta automatiza esse processo, servindo também como um ponto de captação de potenciais alunos (**leads**) para instituições de ensino ou cursos preparatórios.
 
 ## Funcionalidades
 
-* **Cálculo Ponderado:** O sistema não faz apenas uma média simples. Ele cruza as 5 notas do usuário com os pesos específicos de cada oferta de curso disponível no banco de dados.
-* **Ranking:** Os resultados são ordenados automaticamente da maior média para a menor. Isso mostra ao usuário onde sua nota "rende mais".
-* **Módulo de Captura de Leads:** Implementação de um gate de conteúdo. Para visualizar o ranking completo, o usuário deve fornecer Nome, WhatsApp e E-mail. Inclui validação de formulário para garantir dados reais.
-* **Validação de Dados:** O sistema impede entradas inválidas (textos, notas acima de 1000 ou negativas), garantindo a integridade do cálculo.
-* **Interface Responsiva:** Design limpo e adaptável para dispositivos móveis, focado em usabilidade (UX).
+* ** Cálculo Ponderado em Tempo Real:** O sistema não faz apenas uma média simples. Ele cruza as 5 notas do usuário com os pesos específicos de milhares de ofertas de cursos.
+* **Ranking Inteligente:** Os resultados são ordenados automaticamente da maior média para a menor, mostrando onde a nota do aluno "rende mais".
+* **Gate de Conteúdo (Captura de Leads):** Para visualizar o resultado, o usuário deve fornecer Nome, E-mail e Telefone.
+* **Validação de Dados:** O sistema impede entradas inválidas (notas acima de 1000, textos, etc) e valida o formulário de contato antes do envio.
+* **Interface Responsiva:** Design focado em usabilidade (UX), adaptável para celulares e desktops.
 
-## Arquitetura
+## Arquitetura e Decisões Técnicas
 
 O projeto foi desenhado focando em velocidade de resposta e simplicidade de manutenção.
 
-* **Backend:** Python com framework Flask. Optei por essa stack pela robustez matemática e facilidade de manipulação de estruturas de dados.
-* **Banco de Dados:** Utilizei uma estrutura baseada em JSON carregado em memória, estrutura essa, que foi obtida por meio de um script simples do tipo "scratcher" que busca na api do site do SISU todos os dados requisitados e, armazenou localmente afim de evitar demora, em vista que o site costuma apresentar muita lentidão nos dias que as inscrições estão abertas.
-* *Decisão de Engenharia:* Como os pesos das universidades não mudam a cada segundo, não havia necessidade de um banco SQL pesado. Carregar o JSON na memória RAM do servidor garante que o cálculo de milhares de cursos ocorra em milissegundos, eliminando latência.
-* **Frontend:** HTML5, CSS3 e JavaScript para validações no lado do cliente, reduzindo a carga no servidor.
- 
-## Estrutura de Arquivos
+### Backend (Python + Flask)
+Optei por essa stack pela robustez matemática e facilidade de manipulação de dados.
 
-* `app.py`: Controlador principal. Contém a lógica de rotas, processamento do formulário e o algoritmo de cálculo de média ponderada.
-* `templates/index.html`: Interface do usuário. Contém o formulário, o script do modal de captura e a lógica de exibição dos resultados (Jinja2).
-* `banco_de_dados_completo.json`: Fonte da verdade contendo cursos, universidades e seus respectivos pesos por matéria.
+### Banco de Dados Híbrido
+Para otimizar a performance, utilizei uma abordagem híbrida:
+1.  **Cursos e Pesos (Leitura Rápida):** Utilizei uma estrutura baseada em **JSON carregado em memória**.
+    * *Decisão de Engenharia:* Como os pesos das universidades não mudam a cada segundo, não havia necessidade de querys pesadas em banco SQL para isso. Carregar o JSON na memória RAM garante que o cálculo de milhares de cursos ocorra em milissegundos.
+    * *Origem dos Dados:* Script "scraper" desenvolvido para buscar dados na API pública do SISU.
+2.  **Leads (Persistência Segura):** Para salvar os contatos dos alunos, utilizei um banco de dados **MySQL (via TiDB Cloud)**. Isso garante que os dados de negócio fiquem salvos de forma segura e estruturada na nuvem.
+
+### Frontend
+HTML5, CSS3 (interno para otimização de load na Vercel) e JavaScript puro para validações no lado do cliente, reduzindo a carga no servidor.
 
 ## Autor
 
-Desenvolvedor focado em criar soluções eficientes que aliam engenharia de software e geração de lucro para empresas 
+**Claudio Monstans**
 
-Esse é o meu primeiro projeto, em breve irei adicionar novas funcionalidades, estou o utilizando para aprender na prática o que  o mercado busca, para não ficar preso apenas à teoria.
-,Claudio Monstans
-Linkedin: https://www.linkedin.com/in/cmonstans
+Desenvolvedor focado em criar soluções eficientes que aliam engenharia de software e geração de lucro para empresas.
+
+Este é o meu primeiro projeto de portfólio. Estou utilizando-o para aplicar na prática as demandas reais do mercado, evitando ficar preso apenas à teoria. Em breve, novas funcionalidades serão adicionadas.
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/cmonstans)
+
+---
+*Projeto sob licença MIT, entretanto, todos os dados sobre cursos são públicos e pertecem às suas respectivas organizações*
