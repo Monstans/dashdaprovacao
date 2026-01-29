@@ -244,18 +244,21 @@
                 <label>Suas Notas do ENEM:</label>
                 
                 <div class="notas-grid">
-                    <div><input type="number" step="0.1" name="linguagens" placeholder="Linguagens" required></div>
-                    <div><input type="number" step="0.1" name="humanas" placeholder="Humanas" required></div>
-                    <div><input type="number" step="0.1" name="natureza" placeholder="Naturezas" required></div>
-                    <div><input type="number" step="0.1" name="matematica" placeholder="Matemática" required></div>
+                    <div><input type="text" inputmode="decimal" name="linguagens" placeholder="Linguagens" value="{{ notas.linguagens }}" oninput="validarNota(this)" required></div>
+                    <div><input type="text" inputmode="decimal" name="humanas" placeholder="Humanas" value="{{ notas.humanas }}" oninput="validarNota(this)" required></div>
+                    <div><input type="text" inputmode="decimal" name="natureza" placeholder="Naturezas" value="{{ notas.natureza }}" oninput="validarNota(this)" required></div>
+                    <div><input type="text" inputmode="decimal" name="matematica" placeholder="Matemática" value="{{ notas.matematica }}" oninput="validarNota(this)" required></div>
                 </div>
 
                 <div style="margin-top: 15px;">
-                    <input type="number" step="0.1" name="redacao" placeholder="Redação" required>
+                    <input type="number" step="0.1" name="redacao" placeholder="Redação" value="{{ notas.redacao }}" oninput="validarNota(this)" required>
                 </div>
             </div>
-
-            <button type="button" onclick="abrirModal()">Calcular Minhas Médias</button>
+            {% if lead_reg %}
+                <button type="button" onclick="submitDireto()">Calcular Minhas Médias</button>
+            {% else %}
+                <button type="button" onclick="abrirModal()">Calcular Minhas Médias</button>
+            {% endif %}
 
             <div id="modalLead" class="modal-overlay">
                 <div class="modal-content">
@@ -328,30 +331,46 @@
             e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
         });
 
-        function abrirModal() {
-            const form = document.getElementById('formCalculo');
-            
+        function validarNota(input) {
+            input.value = input.value.replace(/[^0-9.,]/g, '');
+        }
+
+        function submitDireto() {
+            const form = document.getElementById("formCalculo");
+            if (validarCamposNotas(form)) {
+                form.submit();
+            }
+        }
+
+        function validarCamposNotas(form) {
             const camposNotas = form.querySelectorAll('input:not(#nome_lead):not(#email_lead):not(#telefone_lead):not([type="hidden"])');
             let formValido = true;
-            
-            camposNotas.forEach(campo => {
-                if (!campo.checkValidity()) {
-                    campo.reportValidity();
-                    formValido = false;
-                    return;
-                }
-            });
+        }
 
-            if(!hiddenCursoId.value) {
-                inputCurso.setCustomValidity("Por favor, selecione um curso da lista.");
-                inputCurso.reportValidity();
+        camposNotas.forEach(campo => {
+            if (!campo.value) {
+                campo.setCustomValidity("Preencha este campo");
+                campo.reportValidity();
                 formValido = false;
+                return;
             } else {
-                inputCurso.setCustomValidity("");
+                campo.setCustomValidity("");
             }
+        });
 
-            if (formValido) {
-                document.getElementById('modalLead').style.display = 'flex';
+        if(!hiddenCursoId.value) {
+            inputCurso.setCustomValidity("Por favor, selecione um curso da lista.");
+            inputCurso.reportValidity();
+            formValido = false;
+        } else {
+            inputCurso.setCustomValidity("");
+        }
+        return formValido;
+    
+        function abrirModal() {
+            const form = document.getElementById('formCalculo');
+            if (validarCamposNotas(form)) {
+                document.getElementById('modalLead').style.display = "flex";
             }
         }
 

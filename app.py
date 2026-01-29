@@ -83,11 +83,24 @@ def index():
     cursos_disponiveis = carregar_cursos_local()
     curso_atual_nome = "Selecione um curso"
 
+    lead_reg = session.get("lead_reg", False)
+
+    notas_salvas = {
+        "linguagens": '', "humanas": '', "natureza": '', "matematica": '', "redacao": ''
+    }
+
     if request.method == 'POST':
         try:
-            nome_lead = request.form.get('nome_lead')
-            email_lead = request.form.get('email_lead')
-            telefone_lead = request.form.get('telefone_lead')
+            notas_salvas["linguagens"] = request.form.get("lingagens", '')
+            notas_salvas["humanas"] = request.form.get("humanas", '')
+            notas_salvas["natureza"] = request.form.get("natureza", '')
+            notas_salvas["matematica"] = request.form.get("matematica", '')
+            notas_salvas["redacao"] = request.form.get("redacao", '')
+
+            if not lead_reg:
+                nome_lead = request.form.get('nome_lead')
+                email_lead = request.form.get('email_lead')
+                telefone_lead = request.form.get('telefone_lead')
 
             if nome_lead and email_lead:
                 salvar_lead_mysql(nome_lead, email_lead, telefone_lead)
@@ -109,11 +122,11 @@ def index():
                     lista_para_loop = dados
 
                 nota = {
-                    'redacao': float(request.form.get('redacao', '0').replace(',', '.')),
-                    'natureza': float(request.form.get('natureza', '0').replace(',', '.')),
-                    'humanas': float(request.form.get('humanas', '0').replace(',', '.')),
-                    'linguagens': float(request.form.get('linguagens', '0').replace(',', '.')),
-                    'matematica': float(request.form.get('matematica', '0').replace(',', '.'))
+                    'redacao': float(request.form.get('redacao', '0').replace(',', '.') or 0),
+                    'natureza': float(request.form.get('natureza', '0').replace(',', '.') or 0),
+                    'humanas': float(request.form.get('humanas', '0').replace(',', '.') or 0),
+                    'linguagens': float(request.form.get('linguagens', '0').replace(',', '.') or 0),
+                    'matematica': float(request.form.get('matematica', '0').replace(',', '.') or 0)
                 }
 
                 for info in lista_para_loop:
@@ -139,7 +152,7 @@ def index():
                             "faculdade": info.get('no_ies', 'Desconhecida'),
                             "campus": info.get('no_campus', 'Campus único'),
                             "local": f"{info.get('no_municipio_campus')}-{info.get('sg_uf_ies')}",
-                            "media": f"{media:.1f}",
+                            "media": f"{media:.2f}",
                             "media_float": media
                         })
                     except Exception:
@@ -160,7 +173,9 @@ def index():
                            resultados=resultados, 
                            erro=erro, 
                            cursos=cursos_disponiveis, 
-                           curso_selecionado=curso_atual_nome)
+                           curso_selecionado=curso_atual_nome,
+                           notas=notas_salvas,
+                           lead_reg=lead_reg)
 
 def mascarar(texto):
     if not texto or len(texto) < 5:
