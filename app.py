@@ -5,7 +5,7 @@ import mysql.connector
 
 app = Flask(__name__)
 
-app.secret_key = os.environ.get("SECRET_KET")
+app.secret_key = os.environ.get("SECRET_KEY")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 DB_HOST = os.environ.get("DB_HOST")
