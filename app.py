@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
 import json
 import os
 import mysql.connector
 
 app = Flask(__name__)
+
+app.secret_key = os.environ.get("SECRET_KET")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 DB_HOST = os.environ.get("DB_HOST")
 DB_USER = os.environ.get("DB_USER")
@@ -114,7 +117,7 @@ def index():
                 }
 
                 for info in lista_para_loop:
-                    if not isinstance(info, dict): continue     
+                    if not isinstance(info, dict): continue      
                     try:
                         if 'no_ies' not in info: continue
 
@@ -159,9 +162,71 @@ def index():
                            cursos=cursos_disponiveis, 
                            curso_selecionado=curso_atual_nome)
 
+def mascarar(texto):
+    if not texto or len(texto) < 5:
+        return "***"
+    return f"{texto[:2]}****{texto[-2:]}"
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    erro = None
+    senha_demo = os.environ.get("ADMIN_PASSWORD", "Senha não configurada")
+    
+    if request.method == 'POST':
+        senha_digitada = request.form.get('senha')
+        if senha_digitada and senha_digitada == ADMIN_PASSWORD:
+            session['usuario_logado'] = True
+            return redirect(url_for('admin'))
+        else:
+            erro = "Senha incorreta."
+    
+    return render_template('login.html', erro=erro, senha_demo=senha_demo)
+
+@app.route('/admin')
+def admin():
+    if not session.get('usuario_logado'):
+        return redirect(url_for('login'))
+    
+    leads_seguros = []
+    conexao = None
+    
+    try:
+        conexao = mysql.connector.connect(
+            host=DB_HOST, 
+            user=DB_USER, 
+            password=DB_PASS, 
+            database=DB_NAME, 
+            port=DB_PORT,
+            ssl_verify_identity=False, 
+            ssl_ca=''
+        )
+        if conexao.is_connected():
+            cursor = conexao.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM leads ORDER BY id DESC")
+            dados = cursor.fetchall()
+            
+            for lead in dados:
+                leads_seguros.append({
+                    'id': lead['id'],
+                    'nome': lead['nome'],
+                    'email': mascarar(lead['email']),
+                    'telefone': mascarar(lead['telefone']),
+                    'data_registro': lead.get('data_registro', '-')
+                })
+            
+            cursor.close()
+    except Exception as e:
+        print(f"Erro no Admin: {e}")
+    finally:
+        if conexao and conexao.is_connected():
+            conexao.close()
+
+    return render_template('admin.html', leads=leads_seguros)
+
+@app.route('/logout')
+def logout():
+    session.pop('usuario_logado', None)
+    return redirect(url_for('login'))
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-

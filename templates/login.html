@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Restrito</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #111827; color: #fff; font-family: 'JetBrains Mono', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1f2937; padding: 40px; border-radius: 8px; border: 1px solid #374151; text-align: center; width: 100%; max-width: 350px; }
+        h2 { color: #60a5fa; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 15px 0; background: #374151; border: 1px solid #4b5563; color: white; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
+        .erro { color: #f87171; background: rgba(248, 113, 113, 0.1); padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 0.9rem; }
+        .tag { background: #374151; padding: 4px 8px; border-radius: 4px; color: #60a5fa; border: 1px dashed #60a5fa; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>🔒 Admin Access</h2>
+        <p style="color: #9ca3af; font-size: 0.8rem;">Acesso exclusivo para testes.</p>
+        
+        <p style="margin-bottom: 25px;">Credencial Demo: <span class="tag">{{ senha_demo }}</span></p>
+
+        {% if erro %}
+            <div class="erro">⚠️ {{ erro }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <input type="password" name="senha" placeholder="Insira a senha..." required>
+            <button type="submit">CONECTAR</button>
+        </form>
+    </div>
+</body>
+</html>

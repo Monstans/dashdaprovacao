@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel TiDB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        body { background: #0f172a; color: #e2e8f0; font-family: 'Poppins', sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 20px; }
+        .btn-sair { background: #ef4444; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: #1e293b; border-radius: 8px; overflow: hidden; }
+        th { background: #0f172a; padding: 15px; font-size: 0.8rem; text-transform: uppercase; color: #60a5fa; }
+        td { padding: 15px; border-bottom: 1px solid #334155; }
+        .mascara { font-family: 'JetBrains Mono', monospace; color: #94a3b8; letter-spacing: -1px; }
+        .aviso { margin-top: 20px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #34d399; padding: 15px; border-radius: 8px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>Leads (TiDB Cloud)</h3>
+            <a href="/logout" class="btn-sair">Desconectar</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email (LGPD)</th>
+                    <th>Telefone (LGPD)</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>#{{ lead.id }}</td>
+                    <td>{{ lead.nome }}</td>
+                    <td class="mascara">{{ lead.email }}</td>
+                    <td class="mascara">{{ lead.telefone }}</td>
+                    <td style="font-size: 0.85rem;">{{ lead.data_registro }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" style="text-align: center; padding: 20px;">Nenhum dado encontrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="aviso">
+            🛡️ <strong>LGPD Ativa:</strong> Dados sensíveis mascarados para demonstração pública.
+        </div>
+    </div>
+</body>
+</html>
