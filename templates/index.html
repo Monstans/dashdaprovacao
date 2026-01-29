@@ -88,6 +88,16 @@
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number]{
+            -moz-appearance: textfield;
+        }
+
         .notas-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -210,7 +220,7 @@
     <div class="container">
         <h1>Dashboard da Aprovação</h1>
         <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">
-            Simule sua nota e descubra sua melhor estratégia no SISU.
+            Simule sua nota e descubra a sua melhor estratégia no SISU
         </p>
 
         {% if erro %}
@@ -234,14 +244,14 @@
                 <label>Suas Notas do ENEM:</label>
                 
                 <div class="notas-grid">
-                    <div><input type="number" step="0.1" name="linguagens" placeholder="Ling." required></div>
-                    <div><input type="number" step="0.1" name="humanas" placeholder="Hum." required></div>
-                    <div><input type="number" step="0.1" name="natureza" placeholder="Nat." required></div>
-                    <div><input type="number" step="0.1" name="matematica" placeholder="Mat." required></div>
+                    <div><input type="number" step="0.1" name="linguagens" placeholder="Linguagens" required></div>
+                    <div><input type="number" step="0.1" name="humanas" placeholder="Humanas" required></div>
+                    <div><input type="number" step="0.1" name="natureza" placeholder="Naturezas" required></div>
+                    <div><input type="number" step="0.1" name="matematica" placeholder="Matemática" required></div>
                 </div>
 
                 <div style="margin-top: 15px;">
-                    <input type="number" step="0.1" name="redacao" placeholder="Nota da Redação" required>
+                    <input type="number" step="0.1" name="redacao" placeholder="Redação" required>
                 </div>
             </div>
 
