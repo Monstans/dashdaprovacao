@@ -116,7 +116,6 @@
         
         button:active { transform: translateY(0); }
 
-        /* MENSAGENS DE ERRO */
         .erro { 
             background-color: #fee2e2; 
             color: #b91c1c; 
@@ -130,7 +129,6 @@
         
         .msg-erro { color: #ef4444; font-size: 0.85rem; margin-top: 4px; display: block; }
 
-        /* RESULTADOS */
         .resultados-lista { display: flex; flex-direction: column; gap: 16px; }
         
         .resultado-card {
@@ -195,11 +193,9 @@
         }
         .close-btn:hover { color: var(--text-main); }
 
-        /* ANIMAÇÕES */
         @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
         @keyframes slideUpModal { from {transform: translateY(20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
 
-        /* RESPONSIVIDADE */
         @media (max-width: 600px) {
             .notas-grid { grid-template-columns: 1fr 1fr; }
             .resultado-card { flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -224,23 +220,28 @@
         <form id="formCalculo" method="POST" action="/">
             
             <div class="input-group">
-                <label for="curso_id">Qual curso você deseja simular?</label>
-                <select name="curso_id" id="curso_id" required>
-                    <option value="" disabled selected>Selecione uma opção...</option>
+                <label for="curso_input">Qual curso você deseja simular?</label>
+                <input list="lista_cursos" id="curso_input" placeholder="Digite para buscar seu curso..." required>
+                <datalist id="lista_cursos">
                     {% for id, nome in cursos.items() %}
-                        <option value="{{ id }}">{{ nome }}</option>
+                        <option data-id="{{ id }}" value="{{ nome }}"></option>
                     {% endfor %}
-                </select>
+                </datalist>
+                <input type="hidden" name="curso_id" id="curso_id_hidden">
             </div>
 
             <div class="input-group">
                 <label>Suas Notas do ENEM:</label>
+                
                 <div class="notas-grid">
                     <div><input type="number" step="0.1" name="linguagens" placeholder="Ling." required></div>
                     <div><input type="number" step="0.1" name="humanas" placeholder="Hum." required></div>
                     <div><input type="number" step="0.1" name="natureza" placeholder="Nat." required></div>
                     <div><input type="number" step="0.1" name="matematica" placeholder="Mat." required></div>
-                    <div><input type="number" step="0.1" name="redacao" placeholder="Red." required></div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <input type="number" step="0.1" name="redacao" placeholder="Nota da Redação" required>
                 </div>
             </div>
 
@@ -296,6 +297,22 @@
     </div>
 
     <script>
+        const inputCurso = document.getElementById('curso_input');
+        const hiddenCursoId = document.getElementById('curso_id_hidden');
+        const datalist = document.getElementById('lista_cursos');
+
+        inputCurso.addEventListener('input', function() {
+            const val = this.value;
+            const options = datalist.options;
+            hiddenCursoId.value = ""; 
+            for(let i=0; i<options.length; i++) {
+                if(options[i].value === val) {
+                    hiddenCursoId.value = options[i].getAttribute('data-id');
+                    break;
+                }
+            }
+        });
+
         document.getElementById('telefone_lead').addEventListener('input', function (e) {
             var x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
             e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
@@ -303,7 +320,8 @@
 
         function abrirModal() {
             const form = document.getElementById('formCalculo');
-            const camposNotas = form.querySelectorAll('select, .notas-grid input');
+            
+            const camposNotas = form.querySelectorAll('input:not(#nome_lead):not(#email_lead):not(#telefone_lead):not([type="hidden"])');
             let formValido = true;
             
             camposNotas.forEach(campo => {
@@ -313,6 +331,14 @@
                     return;
                 }
             });
+
+            if(!hiddenCursoId.value) {
+                inputCurso.setCustomValidity("Por favor, selecione um curso da lista.");
+                inputCurso.reportValidity();
+                formValido = false;
+            } else {
+                inputCurso.setCustomValidity("");
+            }
 
             if (formValido) {
                 document.getElementById('modalLead').style.display = 'flex';
