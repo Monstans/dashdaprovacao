@@ -206,6 +206,10 @@ def admin():
             dados = cursor.fetchall()
             
             for lead in dados:
+                data_formatar = '-'
+                if lead.get('data_registro'):
+                    data_formatar = lead['data_registro'].strftime("%d/%m/%Y")
+
                 leads_seguros.append({
                     'id': lead['id'],
                     'nome': lead['nome'],
