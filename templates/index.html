@@ -309,7 +309,7 @@
         {% endif %}
     </div>
 
-    <script>
+<script>
         const inputCurso = document.getElementById('curso_input');
         const hiddenCursoId = document.getElementById('curso_id_hidden');
         const datalist = document.getElementById('lista_cursos');
@@ -343,32 +343,41 @@
         }
 
         function validarCamposNotas(form) {
+            // Seleciona os inputs de nota (excluindo os do lead e hidden)
             const camposNotas = form.querySelectorAll('input:not(#nome_lead):not(#email_lead):not(#telefone_lead):not([type="hidden"])');
             let formValido = true;
-        }
 
-        camposNotas.forEach(campo => {
-            if (!campo.value) {
-                campo.setCustomValidity("Preencha este campo");
-                campo.reportValidity();
-                formValido = false;
-                return;
+            // --- AQUI ESTAVA O ERRO: A LÓGICA AGORA ESTÁ DENTRO DA FUNÇÃO ---
+            
+            camposNotas.forEach(campo => {
+                if (!campo.value) {
+                    campo.setCustomValidity("Preencha este campo");
+                    campo.reportValidity();
+                    formValido = false;
+                    return; // Sai do forEach (mas não da função)
+                } else {
+                    campo.setCustomValidity("");
+                }
+            });
+
+            // Se algum campo falhou, retorna falso imediatamente
+            if (!formValido) return false;
+
+            // Validação do Curso
+            if(!hiddenCursoId.value) {
+                inputCurso.setCustomValidity("Por favor, selecione um curso da lista.");
+                inputCurso.reportValidity();
+                return false;
             } else {
-                campo.setCustomValidity("");
+                inputCurso.setCustomValidity("");
             }
-        });
 
-        if(!hiddenCursoId.value) {
-            inputCurso.setCustomValidity("Por favor, selecione um curso da lista.");
-            inputCurso.reportValidity();
-            formValido = false;
-        } else {
-            inputCurso.setCustomValidity("");
+            return true;
         }
-        return formValido;
-    
+
         function abrirModal() {
             const form = document.getElementById('formCalculo');
+            // Agora a função é chamada corretamente
             if (validarCamposNotas(form)) {
                 document.getElementById('modalLead').style.display = "flex";
             }
