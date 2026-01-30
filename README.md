@@ -18,7 +18,7 @@ Calcular isso manualmente para centenas de opções é inviável. Esta ferrament
 
 ## Funcionalidades
 
-* ** Cálculo Ponderado em Tempo Real:** O sistema não faz apenas uma média simples. Ele cruza as 5 notas do usuário com os pesos específicos de milhares de ofertas de cursos.
+* **Cálculo Ponderado em Tempo Real:** O sistema não faz apenas uma média simples. Ele cruza as 5 notas do usuário com os pesos específicos de milhares de ofertas de cursos.
 * **Ranking Inteligente:** Os resultados são ordenados automaticamente da maior média para a menor, mostrando onde a nota do aluno "rende mais".
 * **Gate de Conteúdo (Captura de Leads):** Para visualizar o resultado, o usuário deve fornecer Nome, E-mail e Telefone.
 * **Validação de Dados:** O sistema impede entradas inválidas (notas acima de 1000, textos, etc) e valida o formulário de contato antes do envio.
